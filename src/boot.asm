@@ -1,4 +1,3 @@
-; NASM syntax, 32-bit
 BITS 32
 
 SECTION .multiboot

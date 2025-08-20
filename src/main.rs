@@ -23,10 +23,10 @@ pub extern "C" fn kernel_main() -> ! {
         let mid_off: usize = (HEIGHT / 2 * WIDTH + (WIDTH / 2 - 1)) << 1;
 
         VGA_BUFFER.add(mid_off).write_volatile(b'4');
-        VGA_BUFFER.add(mid_off + 1).write_volatile(0x07);
+        VGA_BUFFER.add(mid_off + 1).write_volatile(0xd);
 
         VGA_BUFFER.add(mid_off + 2).write_volatile(b'2');
-        VGA_BUFFER.add(mid_off + 3).write_volatile(0x07);
+        VGA_BUFFER.add(mid_off + 3).write_volatile(0xd);
     }
 
     loop {}

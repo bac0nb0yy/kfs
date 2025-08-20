@@ -6,6 +6,7 @@ GRUBMKRESCUE:= grub-mkrescue
 
 TARGET 		:= i386-none
 TARGET_JSON := $(TARGET).json
+SRC			:= $(shell find src -type f -name '*.rs')
 
 KERNEL_ELF  := kernel.elf
 KERNEL_BIN  := kernel.bin
@@ -39,11 +40,10 @@ re: fclean all
 boot.o: src/boot.asm
 	$(NASM) -f elf32 $< -o $@
 
-main.o:
+main.o: $(SRC) Cargo.toml Cargo.lock $(TARGET_JSON)
 	cargo +nightly rustc --target $(TARGET_JSON) \
 	    -Z build-std=core,compiler_builtins --release \
-	    -- -C codegen-units=1 --emit=obj
-	cp -f target/$(TARGET)/release/deps/kfs-*.o main.o
+	    -- -C codegen-units=1 --emit=obj=main.o
 
 # --- Link kernel -------------------------------------------------------------
 
@@ -51,10 +51,7 @@ $(KERNEL_ELF): boot.o main.o linker.ld
 	$(LD) -m elf_i386 -T linker.ld -o $(KERNEL_ELF) boot.o main.o
 
 $(KERNEL_BIN): $(KERNEL_ELF)
-	# For GRUB Multiboot, we can keep the ELF as "kernel.bin".
-	# If you want a raw binary, you could objcopy, but GRUB expects an ELF w/ multiboot.
 	objcopy $(KERNEL_ELF) $(KERNEL_BIN)
-	@ls -lh $(KERNEL_BIN)
 
 # --- ISO with GRUB -----------------------------------------------------------
 
@@ -62,4 +59,3 @@ $(ISO_OUT): $(KERNEL_BIN) iso/boot/grub/grub.cfg
 	@mkdir -p $(ISO_DIR)/boot
 	cp $(KERNEL_BIN) $(ISO_DIR)/boot/kernel.bin
 	$(GRUBMKRESCUE) -o $(ISO_OUT) $(ISO_DIR)
-	@ls -lh $(ISO_OUT)

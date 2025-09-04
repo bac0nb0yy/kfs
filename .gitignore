@@ -1,5 +1,6 @@
-/target
+target/
 *.elf
 *.bin
 *.o
 *.iso
+.vagrant/

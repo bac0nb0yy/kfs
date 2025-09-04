@@ -1,5 +1,11 @@
+SRC_DIR		:= src
+
 TARGET 		:= i386-unknown-none.json
-SRC			:= $(shell find src -type f -name '*.rs')
+RUST_SRC	:= $(shell find $(SRC_DIR) -type f -name '*.rs')
+ASM_SRC 	:= $(shell find $(SRC_DIR) -type f -name '*.asm')
+
+ASM_OBJ 	:= $(ASM_SRC:.asm=.o)
+RUST_OBJ	:= main.o
 
 KERNEL_BIN  := kernel.bin
 ISO_DIR     := iso
@@ -34,16 +40,16 @@ re: fclean all
 
 # --- Build objects -----------------------------------------------------------
 
-boot.o: src/boot.asm
+%.o: %.asm
 	nasm -f elf32 $< -o $@
 
-main.o: $(SRC) Cargo.toml $(TARGET)
+$(RUST_OBJ): $(RUST_SRC) Cargo.toml $(TARGET)
 	cargo +nightly rustc $(RUSTFLAGS)
 
 # --- Link kernel -------------------------------------------------------------
 
-$(KERNEL_BIN): boot.o main.o linker.ld
-	ld -m elf_i386 -T linker.ld -o $(KERNEL_BIN) boot.o main.o
+$(KERNEL_BIN): $(ASM_OBJ) $(RUST_OBJ) linker.ld
+	ld -m elf_i386 -T linker.ld -o $(KERNEL_BIN) $(ASM_OBJ) $(RUST_OBJ)
 
 # --- ISO with GRUB -----------------------------------------------------------
 

@@ -9,9 +9,11 @@ edition = "2024"
 panic = "abort"
 
 [profile.release]
+opt-level = "z"
 panic = "abort"
 
 [lib]
+path = "src/rust/lib.rs"
 crate-type = ["staticlib"]
 test = false
 doctest = false

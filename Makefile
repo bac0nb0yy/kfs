@@ -1,8 +1,8 @@
 SRC_DIR		:= src
 
 TARGET 		:= i386-unknown-none.json
-RUST_SRC	:= $(shell find $(SRC_DIR) -type f -name '*.rs')
-ASM_SRC 	:= $(shell find $(SRC_DIR) -type f -name '*.asm')
+RUST_SRC	:= $(shell find $(SRC_DIR)/rust -type f -name '*.rs')
+ASM_SRC 	:= $(shell find $(SRC_DIR)/asm -type f -name '*.asm')
 
 ASM_OBJ 	:= $(ASM_SRC:.asm=.o)
 RUST_OBJ	:= main.o

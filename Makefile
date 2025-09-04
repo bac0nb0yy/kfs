@@ -9,6 +9,8 @@ SHARED_DIR	:= /vagrant
 
 RUSTFLAGS := --target $(TARGET) \
 	-Z build-std=core,compiler_builtins --release -- \
+	-C panic=abort -C opt-level=z -C relocation-model=static \
+	-C link-arg=-nostdlib -C link-arg=-nodefaultlibs \
 	-C codegen-units=1 --emit=obj=main.o
 
 # --- Top-level targets -------------------------------------------------------

@@ -14,28 +14,27 @@ This project is a minimal operating system kernel written in Rust and assembly f
 
 ```
 kfs/
-|
-|-- .gitignore
-|-- Cargo.lock
-|-- Cargo.toml
-|-- i386-unknown-none.json
-|-- linker.ld
-|-- Makefile
-|-- README.MD
-|-- rust-toolchain.toml
-|-- Vagrantfile
-|-- .cargo/
-|   |-- config.toml
-|-- iso/
-|   |-- boot/
-|       |-- grub/
-|           |-- grub.cfg
-|-- src/
-    |-- asm/
-    |   |-- boot.asm
-    |   |-- multiboot.asm
-    |-- rust/
-        |-- lib.rs
+├── .gitignore
+├── Cargo.lock
+├── Cargo.toml
+├── i386-unknown-none.json
+├── linker.ld
+├── Makefile
+├── README.MD
+├── rust-toolchain.toml
+├── Vagrantfile
+├── .cargo/
+│   └── config.toml
+├── iso/
+│   └── boot/
+│       └── grub/
+│           └── grub.cfg
+└── src/
+    ├── asm/
+    │   ├── boot.asm
+    │   └── multiboot.asm
+    └── rust/
+        └── lib.rs
 ```
 
 - **`src/rust/lib.rs`**: The Rust kernel entry point.

@@ -22,7 +22,6 @@ kfs/
 ├── Makefile
 ├── README.MD
 ├── rust-toolchain.toml
-├── Vagrantfile
 ├── .cargo/
 │   └── config.toml
 ├── iso/
@@ -42,7 +41,6 @@ kfs/
 - **`src/asm/multiboot.asm`**: Multiboot2 header for GRUB compatibility.
 - **`linker.ld`**: Defines the memory layout and entry point.
 - **`Makefile`**: Automates the build, clean, and run processes.
-- **`Vagrantfile`**: Sets up a virtualized environment for ISO generation.
 - **`iso/boot/grub/grub.cfg`**: GRUB configuration for booting the kernel.
 
 ## Prerequisites
@@ -50,7 +48,6 @@ kfs/
 - **Rust nightly toolchain**: Install using `rustup` and ensure the `rust-toolchain.toml` is respected.
 - **NASM**: For assembling the bootloader.
 - **QEMU**: For running the kernel in a virtualized environment.
-- **Vagrant**: For creating the bootable ISO.
 
 ## Building and Running
 

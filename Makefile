@@ -11,8 +11,6 @@ KERNEL_BIN  := kernel.bin
 ISO_DIR     := iso
 ISO_OUT     := kfs.iso
 
-SHARED_DIR	:= /vagrant
-
 # --- Top-level targets -------------------------------------------------------
 
 all: $(KERNEL_BIN)
@@ -28,7 +26,6 @@ clean:
 fclean: clean
 	rm -rf iso/boot/kernel.bin
 	cargo clean
-	vagrant destroy --force
 
 re: fclean all
 
@@ -49,8 +46,31 @@ $(KERNEL_BIN): $(ASM_OBJ) $(RUST_LIB) linker.ld
 
 # --- ISO with GRUB -----------------------------------------------------------
 
-$(ISO_OUT): $(KERNEL_BIN) iso/boot/grub/grub.cfg Vagrantfile
-	vagrant up
-	vagrant ssh -c "cp $(SHARED_DIR)/$(KERNEL_BIN) $(SHARED_DIR)/$(ISO_DIR)/boot/kernel.bin"
-	vagrant ssh -c "grub-mkrescue -o $(SHARED_DIR)/$(ISO_OUT) $(SHARED_DIR)/$(ISO_DIR)"
-	vagrant halt
+$(ISO_OUT): $(KERNEL_BIN) iso/boot/grub/grub.cfg
+	@cp $(KERNEL_BIN) $(ISO_DIR)/boot/kernel.bin
+	@grub-mkrescue -o $(ISO_OUT) $(ISO_DIR)
+
+define compile_from_source
+    @rm -rf source_dir source.tar.gz
+	@wget -O source.tar.gz $(1)
+    @mkdir source_dir && tar xvf source.tar.gz -C source_dir --strip-components=1
+    @cd source_dir && ./configure --prefix=$$HOME/.local && make -j && make install
+    @rm -rf source_dir source.tar.gz
+endef
+
+install_requirements: uninstall_requirements
+	$(call compile_from_source,https://mirror.cyberbits.eu/gnu/bison/bison-3.8.tar.xz)
+	$(call compile_from_source,https://github.com/westes/flex/files/981163/flex-2.6.4.tar.gz)
+	$(call compile_from_source,ftp://ftp.gnu.org/gnu/grub/grub-2.06.tar.xz)
+	$(call compile_from_source,https://www.gnu.org/software/xorriso/xorriso-1.5.4.tar.gz)
+
+uninstall_requirements:
+	@rm -rf source_dir source.tar.gz
+	@rm -rf $$HOME/.local/bin/grub-*
+	@rm -rf $$HOME/.local/bin/xorriso*
+	@rm -rf $$HOME/.local/bin/osirrox
+	@rm -rf $$HOME/.local/bin/xorrecord
+	@rm -rf $$HOME/.local/etc/grub.d
+	@rm -rf $$HOME/.local/share/grub
+
+.PHONY: all iso run clean fclean re install_requirements uninstall_requirements

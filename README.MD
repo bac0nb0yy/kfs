@@ -80,6 +80,24 @@ kfs/
    make fclean
    ```
 
+## Debug vs Release builds
+
+The `Makefile` supports toggling between release and debug profiles using the `DEBUG` variable.
+
+- Default (release): optimized build
+   ```sh
+   make                 # builds with `cargo build --release`
+   make iso             # packages current build into an ISO
+   ```
+- Debug: unoptimized with debuginfo
+   ```sh
+   make DEBUG=1         # builds with `cargo build`
+   make DEBUG=1 iso     # ensures the kernel is rebuilt in debug before creating the ISO
+   ```
+
+Under the hood, this switches the Rust build profile and links the appropriate
+`target/i386-unknown-none/<profile>/libkfs.a` into `kernel.bin`.
+
 ## How It Works
 
 1. **Bootloader**: The `boot.asm` file initializes the system and calls the `kernel_main` function in Rust.

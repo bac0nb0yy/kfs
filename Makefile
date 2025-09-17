@@ -5,7 +5,13 @@ RUST_SRC	:= $(shell find $(SRC_DIR)/rust -type f -name '*.rs')
 ASM_SRC 	:= $(shell find $(SRC_DIR)/asm -type f -name '*.asm')
 
 ASM_OBJ 	:= $(ASM_SRC:.asm=.o)
-RUST_LIB	:= target/i386-unknown-none/release/libkfs.a
+
+# Build profile selection (default: release). Set DEBUG=1 to build debug.
+DEBUG ?=
+BUILD_PROFILE := $(if $(DEBUG),debug,release)
+CARGO_FLAGS   := $(if $(DEBUG),,--release)
+
+RUST_LIB	:= target/i386-unknown-none/$(BUILD_PROFILE)/libkfs.a
 
 KERNEL_BIN  := kernel.bin
 ISO_DIR     := iso
@@ -35,7 +41,8 @@ re: fclean all
 	nasm -f elf32 $< -o $@
 
 $(RUST_LIB): $(RUST_SRC) Cargo.toml $(TARGET)
-	cargo +nightly build --target $(TARGET) --release
+	@echo "Building Rust crate (profile: $(BUILD_PROFILE))"
+	cargo +nightly build --target $(TARGET) $(CARGO_FLAGS)
 
 # --- Link kernel -------------------------------------------------------------
 

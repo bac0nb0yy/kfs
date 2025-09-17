@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+mod vga_buffer;
+
 use core::panic::PanicInfo;
 
 const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
@@ -28,6 +30,16 @@ pub extern "C" fn kernel_main() -> ! {
         VGA_BUFFER.add(mid_off + 2).write_volatile(b'2');
         VGA_BUFFER.add(mid_off + 3).write_volatile(0xd);
     }
+
+    // unsafe {
+    //     for i in 0..(HEIGHT * WIDTH) {
+    //         let off: usize = i << 1;
+    //         VGA_BUFFER.add(off).write_volatile(b' ');
+    //         VGA_BUFFER.add(off + 1).write_volatile(0x07);
+    //     }
+    // }
+
+    vga_buffer::print_something();
 
     loop {}
 }

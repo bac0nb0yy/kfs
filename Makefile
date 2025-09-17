@@ -5,19 +5,13 @@ RUST_SRC	:= $(shell find $(SRC_DIR)/rust -type f -name '*.rs')
 ASM_SRC 	:= $(shell find $(SRC_DIR)/asm -type f -name '*.asm')
 
 ASM_OBJ 	:= $(ASM_SRC:.asm=.o)
-RUST_OBJ	:= main.o
+RUST_LIB	:= target/i386-unknown-none/release/libkfs.a
 
 KERNEL_BIN  := kernel.bin
 ISO_DIR     := iso
 ISO_OUT     := kfs.iso
 
 SHARED_DIR	:= /vagrant
-
-RUSTFLAGS := --target $(TARGET) \
-	-Z build-std=core,compiler_builtins --release -- \
-	-C panic=abort -C opt-level=z -C relocation-model=static \
-	-C link-arg=-nostdlib -C link-arg=-nodefaultlibs \
-	-C codegen-units=1 --emit=obj=main.o
 
 # --- Top-level targets -------------------------------------------------------
 
@@ -43,13 +37,15 @@ re: fclean all
 %.o: %.asm
 	nasm -f elf32 $< -o $@
 
-$(RUST_OBJ): $(RUST_SRC) Cargo.toml $(TARGET)
-	cargo +nightly rustc $(RUSTFLAGS)
+$(RUST_LIB): $(RUST_SRC) Cargo.toml $(TARGET)
+	cargo +nightly build --target $(TARGET) --release
 
 # --- Link kernel -------------------------------------------------------------
 
-$(KERNEL_BIN): $(ASM_OBJ) $(RUST_OBJ) linker.ld
-	ld -m elf_i386 -T linker.ld -o $(KERNEL_BIN) $(ASM_OBJ) $(RUST_OBJ)
+$(KERNEL_BIN): $(ASM_OBJ) $(RUST_LIB) linker.ld
+	# Link the assembled objects with the rust static library which
+	# contains libcore and the panic implementation
+	ld -m elf_i386 -T linker.ld -o $(KERNEL_BIN) $(ASM_OBJ) $(RUST_LIB)
 
 # --- ISO with GRUB -----------------------------------------------------------
 

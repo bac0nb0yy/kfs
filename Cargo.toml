@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 volatile = "0.2.6"
+lazy_static = { version = "1.0", features = ["spin_no_std"] }
+spin = "0.5.2"
 
 [profile.dev]
 panic = "abort"
